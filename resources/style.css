@@ -179,19 +179,19 @@ a:active {
   margin-right: 5px;
 }
 .notepad-log {
-  width: 100%;
-  max-height: 40px;
-  overflow-y: auto;
-  background-color: var(--background-color-with-alpha);
-  color: var(--color);
-  font-family: monospace;
-  font-size: 6px;
-  padding: 10px;
-  border: 1px solid #ccc;
+  display: inline-block;
+  width: 300%;
+  height: var(--btn-height);
+  border: none;
   border-radius: 10px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-  white-space: pre-wrap;
-  line-height: 1.4em;
+  padding: 0;
+  color: var(--btn-color);
+  background-color: var(--btn-background-color);
+  font-size: 10px;
+  text-align: center;
+  text-decoration: none;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 #game-dropdown-btn {
   margin-left: 0;
