@@ -181,11 +181,11 @@ a:active {
 .notepad-log {
   display: block;
   width: 400%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
-  height: var(--btn-height);
+  max-height: 300px; /* or 원하는 높이 (스크롤이 생길 수 있을 만큼) */
   overflow-y: auto; /* 세로 스크롤 자동 활성화 */
   border: none;
   border-radius: 10px;
-  padding: 0px;
+  padding: 10px;
   color: var(--btn-color);
   background-color: var(--btn-background-color);
   font-size: var(--font-size);
