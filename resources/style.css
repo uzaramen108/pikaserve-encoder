@@ -182,6 +182,7 @@ a:active {
   display: inline-block;
   width: 600%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
   height: var(--btn-height);
+  overflow-x: auto;
   border: none;
   border-radius: 10px;
   padding: 0;
