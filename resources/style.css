@@ -195,11 +195,24 @@ a:active {
   line-height: 1.6em;
   margin: 5px;
 }
+#code-viewer {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 1em;
+  overflow: auto;
+  max-height: 300px;
+  margin-top: 1em;
+  font-family: 'Courier New', monospace;
+}
+#code-viewer-output {
+  white-space: pre-wrap; /* 자동 줄바꿈 */
+  word-break: break-word;
+  color: #dcdcdc;         /* VSCode-style 텍스트 색상 */
+  font-size: 0.95em;
+  line-height: 1.4em;
+}
 #game-dropdown-btn {
   margin-left: 0;
-}
-#code-viewer {
-  margin-left: 200
 }
 #about-btn {
   margin-right: 0;
