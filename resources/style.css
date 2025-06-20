@@ -178,6 +178,24 @@ a:active {
   margin-left: 5px;
   margin-right: 5px;
 }
+.notepad-log {
+  width: 100%;
+  max-width: var(--canvas-width);
+  min-height: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--background-color-with-alpha);
+  color: var(--color);
+  font-family: monospace;
+  font-size: var(--font-size);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  white-space: pre-wrap;
+  line-height: 1.4em;
+  margin: 10px auto;
+}
 #game-dropdown-btn {
   margin-left: 0;
 }
