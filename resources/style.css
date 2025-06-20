@@ -181,7 +181,7 @@ a:active {
 #code-viewer {
   display: inline-block;
   width: 600%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
-  max-height: var(--btn-height);
+  height: var(--btn-height);
   overflow-y: auto; /* 세로 스크롤 자동 활성화 */
   border: none;
   border-radius: 10px;
@@ -203,13 +203,13 @@ a:active {
   margin-top: 1em;
   font-family: 'Courier New', monospace;
 } */
-#code-viewer-output {
-  white-space: pre-wrap; /* 자동 줄바꿈 */
+/* #code-viewer-output {
+  white-space: pre-wrap; 
   word-break: break-word;
-  color: #dcdcdc;         /* VSCode-style 텍스트 색상 */
+  color: #dcdcdc;         
   font-size: 0.95em;
   line-height: 1.4em;
-}
+} */
 #game-dropdown-btn {
   margin-left: 0;
 }
