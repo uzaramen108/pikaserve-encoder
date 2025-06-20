@@ -181,6 +181,9 @@ a:active {
 #game-dropdown-btn {
   margin-left: 0;
 }
+#code-viewer {
+  margin-left: 200
+}
 #about-btn {
   margin-right: 0;
 }
