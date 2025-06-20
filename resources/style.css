@@ -179,21 +179,20 @@ a:active {
   margin-right: 5px;
 }
 #code-viewer {
-  display: block;
+  display: inline-block;
   width: 600%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
   max-height: var(--btn-height);
   overflow-y: auto; /* 세로 스크롤 자동 활성화 */
   border: none;
   border-radius: 10px;
-  padding: 10px;
+  padding: 0;
   color: var(--btn-color);
   background-color: var(--btn-background-color);
   font-size: var(--font-size);
   text-align: left;
   text-decoration: none;
-  white-space: pre-wrap;
-  line-height: 1.6em;
-  margin: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 /* #code-viewer {
   background-color: #1e1e1e;
