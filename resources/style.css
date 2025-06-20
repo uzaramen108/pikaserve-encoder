@@ -178,7 +178,7 @@ a:active {
   margin-left: 5px;
   margin-right: 5px;
 }
-.notepad-log {
+#code-viewer {
   display: block;
   width: 300%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
   max-height: 300px; /* or 원하는 높이 (스크롤이 생길 수 있을 만큼) */
@@ -195,7 +195,7 @@ a:active {
   line-height: 1.6em;
   margin: 5px;
 }
-#code-viewer {
+/* #code-viewer {
   background-color: #1e1e1e;
   border-radius: 10px;
   padding: 1em;
@@ -203,7 +203,7 @@ a:active {
   max-height: 300px;
   margin-top: 1em;
   font-family: 'Courier New', monospace;
-}
+} */
 #code-viewer-output {
   white-space: pre-wrap; /* 자동 줄바꿈 */
   word-break: break-word;
