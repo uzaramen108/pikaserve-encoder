@@ -181,8 +181,8 @@ a:active {
 .notepad-log {
   width: 100%;
   max-width: var(--canvas-width);
-  min-height: 200px;
-  max-height: 300px;
+  min-height: 400px;
+  max-height: 100px;
   overflow-y: auto;
   background-color: var(--background-color-with-alpha);
   color: var(--color);
