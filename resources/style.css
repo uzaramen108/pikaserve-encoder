@@ -180,14 +180,12 @@ a:active {
 }
 .notepad-log {
   width: 100%;
-  max-width: var(--canvas-width);
-  min-height: 400px;
-  max-height: 100px;
+  max-height: 40px;
   overflow-y: auto;
   background-color: var(--background-color-with-alpha);
   color: var(--color);
   font-family: monospace;
-  font-size: 10px;
+  font-size: 6px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 10px;
