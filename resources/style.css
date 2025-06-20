@@ -190,6 +190,8 @@ a:active {
   font-size: var(--font-size);
   text-align: center;
   text-decoration: none;
+  white-space: pre-wrap;
+  line-height: 1.4em;
   margin-left: 5px;
   margin-right: 5px;
 }
