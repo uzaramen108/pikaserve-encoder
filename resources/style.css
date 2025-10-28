@@ -704,3 +704,321 @@ label[for='fps-input'] {
 .no-margin-top {
   margin-top: 0;
 }
+/* --- 페이지 전체 레이아웃 --- */
+.rp-body { /* body 태그에 적용 */
+  background-color: var(--background-color);
+  color: var(--color);
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--rp-font-size);
+  display: flex; /* 수직 중앙 정렬 위해 */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* 최소 화면 높이 */
+}
+
+.rp-flex-container { /* 메인 컨테이너 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 내부 요소 가운데 정렬 */
+  width: var(--rp-canvas-width);
+  max-width: 100%; /* 화면보다 커지지 않게 */
+  padding: 10px 0; /* 위아래 여백 */
+}
+
+#game-canvas-container {
+  position: relative;
+  width: 100%; /* 부모 rp-flex-container 너비 따름 */
+  /* height는 canvas 비율에 맞춰 자동으로 조절되도록 함 */
+  margin-bottom: 15px; /* 컨트롤과의 간격 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 약간의 그림자 */
+}
+
+#game-canvas-container > canvas {
+  display: block; /* 중요: 이미지 아래 불필요한 공백 제거 */
+  width: 100%;
+  height: auto; /* 비율 유지 */
+  aspect-ratio: 432 / 304; /* 명시적 비율 설정 */
+  image-rendering: pixelated;
+}
+#game-canvas-container > canvas.graphic-soft { image-rendering: auto; }
+
+
+/* --- 팝업 / 오버레이 --- */
+.rp-fade-in-box {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: var(--rp-font-size);
+  text-align: center;
+  background-color: var(--background-color-with-alpha, rgba(32, 33, 36, 0.9));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 10;
+  box-sizing: border-box;
+  opacity: 1; /* 기본적으로 보이게 */
+  transition: opacity 0.3s ease-in-out; /* 부드러운 숨김/표시 효과 */
+}
+.rp-fade-in-box.hidden {
+  opacity: 0;
+  pointer-events: none; /* 숨겨졌을 때 클릭 방지 */
+  z-index: -1; /* 다른 요소 뒤로 */
+}
+.rp-fade-in-box p { margin: 0 0 1em 0; line-height: 1.5; }
+
+/* 로딩 박스 */
+.rp-fade-in-box.loading { z-index: 6; background-color: black; color: white; }
+#loading-box #progress-bar-border {
+  border: 1px solid white;
+  height: calc(var(--rp-font-size) * 1.5);
+  width: 80%;
+  max-width: 300px;
+  position: relative;
+  margin: 1em auto 0 auto; /* 텍스트 아래 여백 및 가운데 정렬 */
+}
+#loading-box #progress-bar {
+  background-color: white;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.1s linear; /* 로딩 바 부드럽게 증가 */
+}
+
+/* 파일 드롭 박스 */
+#dropbox {
+  border: 2px dashed var(--color, #bdc1c6);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#dropbox:hover { background-color: rgba(0, 0, 0, 0.1); }
+.rp-custom-file-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  height: var(--rp-btn-height);
+  min-width: var(--rp-btn-min-width);
+  background-color: var(--btn-background-color-2);
+  background-image: var(--btn-background-image);
+  color: var(--color);
+  border: 1px solid var(--btn-border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: inherit;
+  margin-bottom: 0.5em;
+  transition: background-color 0.2s;
+}
+.rp-custom-file-upload:hover { filter: brightness(1.1); }
+#dropbox input[type='file'] { display: none; }
+
+/* 알림 박스 (리플레이 종료, 파일 오류) */
+.rp-fade-in-box.notice { z-index: 11; }
+.rp-btn-in-box {
+  padding: 8px 20px;
+  min-width: calc(6 * var(--rp-font-size));
+  height: auto;
+  border: none;
+  background-color: var(--btn-background-color);
+  color: var(--btn-color);
+  font-size: inherit;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.rp-btn-in-box:hover { filter: brightness(1.2); }
+
+
+/* --- 닉네임 / 채팅 --- */
+.rp-nickname { font-size: calc(1.1 * var(--rp-font-size)); color: white; text-shadow: 1px 1px 2px black; }
+.rp-partial-ip { font-size: calc(0.8 * var(--rp-font-size)); color: white; text-shadow: 1px 1px 2px black; }
+
+.rp-chat-box {
+  z-index: 20;
+  position: absolute;
+  top: 50%;
+  color: white;
+  background-color: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: calc(1.3 * var(--rp-font-size));
+  visibility: hidden;
+  opacity: 0;
+  animation: rp-fade-inout 5s;
+  white-space: pre-wrap;
+  text-shadow: 1px 1px 2px black;
+}
+#player1-chat-box { right: 70%; }
+#player2-chat-box { left: 70%; }
+@keyframes rp-fade-inout { /* 애니메이션 이름 변경 */
+  0% { visibility: visible; opacity: 0; } 25% { opacity: 1; }
+  75% { opacity: 1; } 100% { visibility: hidden; opacity: 0; }
+}
+
+/* --- 가상 키보드 --- */
+.rp-flex-for-keyboard {
+  display: flex;
+  justify-content: space-around;
+  width: 100%; /* 부모 너비 꽉 채움 */
+  max-width: var(--rp-canvas-width); /* 캔버스 너비 넘지 않게 */
+  margin: 10px auto;
+}
+.rp-grid-for-keyboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+  width: calc(5 * var(--rp-btn-height));
+  height: calc(2.3 * var(--rp-btn-height));
+  max-width: 45%; /* 화면 작을 때 대비 */
+}
+.rp-keyboard-key {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--btn-border-color);
+  background-color: var(--btn-background-color-2);
+  color: var(--color);
+  font-size: var(--rp-font-size);
+  border-radius: 3px;
+  padding: 2px;
+}
+#z-key, #enter-key { grid-row: 1; grid-column: 1 / 3; } /* 키 크기 조정 (예시) */
+#r-key, #up-key { grid-row: 1; grid-column: 3 / 5; }
+#d-key, #left-key { grid-row: 2; grid-column: 1 / 2; }
+#v-key, #down-key { grid-row: 2; grid-column: 2 / 4; }
+#g-key, #right-key { grid-row: 2; grid-column: 4 / 5; }
+
+.rp-keyboard-key.pressed {
+  background-color: #f00; color: white; border-color: #f00;
+}
+
+/* --- 컨트롤 바 --- */
+
+/* 컨트롤 바 각 행의 컨테이너 */
+.rp-flex-container > div:has(> #scrubber-range-input),
+.rp-flex-container > div:has(> #play-pause-btn),
+.rp-flex-container > div:has(> #speed-btn-5-fps),
+.rp-flex-container > div:has(> .rp-show-checkboxes-container), /* 클래스명 확인 */
+.rp-flex-container > div:has(> .rp-color-scheme-toggle-switch-container) { /* 클래스명 확인 */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 요소 간 기본 간격 */
+  width: 100%; /* 부모 너비 꽉 채움 */
+  max-width: var(--rp-canvas-width); /* 캔버스 너비 넘지 않게 */
+  margin: 8px auto 0 auto;
+}
+
+/* 스크러버 */
+#scrubber-range-input {
+  width: 100%;
+  height: calc(var(--rp-btn-height) * 0.7); /* 높이 약간 줄임 */
+  cursor: pointer;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* 재생/일시정지, 시간, 탐색 행 */
+#play-pause-btn {
+  height: var(--rp-btn-height);
+  width: var(--rp-btn-height); /* 정사각형 */
+  font-size: calc(var(--rp-font-size) * 1.2);
+  padding: 0;
+}
+.rp-margin-left-right { /* 시간 표시 */
+  margin: 0 10px;
+  font-size: inherit;
+  white-space: nowrap;
+}
+.rp-inline { /* 탐색 버튼 그룹 */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rp-btn-for-replay { /* 모든 리플레이 버튼 */
+  height: var(--rp-btn-height);
+  min-width: calc(var(--rp-btn-min-width) * 0.8); /* 최소 너비 약간 줄임 */
+  width: auto;
+  padding: 0 12px; /* 좌우 여백 */
+  font-size: calc(var(--rp-font-size) * 0.85); /* 글씨 크기 조정 */
+  border: 1px solid var(--btn-border-color);
+  border-radius: 5px;
+  background-color: var(--btn-background-color-2);
+  background-image: var(--btn-background-image);
+  color: var(--color);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.2s;
+}
+.rp-btn-for-replay:hover { filter: brightness(1.1); }
+.rp-btn-for-replay.selected {
+  background-color: var(--link-color);
+  background-image: none;
+  color: white;
+  font-weight: bold;
+  border-color: var(--link-color);
+}
+.rp-disable-dbl-tap-zoom { touch-action: manipulation; }
+
+/* 속도 버튼, FPS 입력 행 */
+.rp-margin-top-little { /* 행 간격 (이제 flex gap으로 대체 가능) */
+  width: 100%; display: flex; justify-content: center;
+  align-items: center; flex-wrap: wrap; gap: 10px;
+}
+label[for='fps-input'] { margin-left: 5px; white-space: nowrap; }
+#fps-input {
+  height: var(--rp-btn-height);
+  width: calc(var(--rp-btn-min-width) * 0.9);
+  font-size: calc(var(--rp-font-size) * 0.85);
+  background-color: var(--background-color);
+  color: var(--color);
+  border: 1px solid var(--btn-border-color);
+  border-radius: 3px;
+  text-align: center;
+  padding: 0 5px;
+}
+
+/* 체크박스 행 */
+.rp-show-checkboxes-container { /* 클래스명 확인 */
+  font-size: calc(var(--rp-font-size) * 0.85);
+  gap: 15px; /* 체크박스 간격 */
+  width: 100%;
+}
+.rp-show-checkboxes-container label {
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+}
+.rp-show-checkboxes-container input[type="checkbox"] {
+  cursor: pointer; vertical-align: middle;
+}
+
+/* 다크 모드 토글 스위치 */
+.rp-color-scheme-toggle-switch-container { /* 클래스명 확인 */
+  display: inline-flex; align-items: center; margin: 0 10px;
+  /* 크기 변수는 공통 CSS 사용 가정 */
+  --toggle-switch-height: calc(1.6 * var(--rp-font-size));
+  --toggle-ball-diameter: calc(1.2 * var(--rp-font-size));
+  /* ... */
+}
+input.rp-toggle-switch { display: none; } /* 클래스명 확인 */
+/* (선/달 아이콘 생략) */
+
+
+/* 재생/일시정지 마크 (화면 중앙) */
+#play-mark, #pause-mark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: calc(4 * var(--rp-font-size));
+  color: rgba(255, 255, 255, 0.4);
+  z-index: 8; pointer-events: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+#play-mark.hidden, #pause-mark.hidden { display: none; }
