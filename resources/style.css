@@ -733,7 +733,6 @@ label[for='fps-input'] {
   position: relative;
   width: 100%; /* 부모 rp-flex-container 너비 따름 */
   /* height는 canvas 비율에 맞춰 자동으로 조절되도록 함 */
-  margin-bottom: 15px; /* 컨트롤과의 간격 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 약간의 그림자 */
 }
 
