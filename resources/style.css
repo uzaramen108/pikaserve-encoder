@@ -747,6 +747,7 @@ label[for='fps-input'] {
 #game-canvas-container > canvas.graphic-soft { image-rendering: auto; }
 
 .rp-fade-in-box {
+  margin-bottom: 20%;
   position: absolute;
   display: flex;
   flex-direction: column;
