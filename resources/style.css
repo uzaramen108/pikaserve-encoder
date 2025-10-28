@@ -710,7 +710,7 @@ label[for='fps-input'] {
 .rp-body { /* body 태그에 적용 */
   background-color: var(--background-color);
   color: var(--color);
-  margin-top: 20px;
+  margin-top: 50px;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: var(--rp-font-size);
@@ -725,7 +725,7 @@ label[for='fps-input'] {
   flex-direction: column;
   align-items: center; /* 내부 요소 가운데 정렬 */
   width: var(--rp-canvas-width);
-  max-width: 70%; /* 화면보다 커지지 않게 */
+  max-width: 60%; /* 화면보다 커지지 않게 */
   padding: 10px 0; /* 위아래 여백 */
 }
 
