@@ -2,15 +2,14 @@
   /* Pikachu Volleyball's original width: 432px, original height: 304px */
   --aspect-ratio: calc(432 / 304);
   --inverse-aspect-ratio: calc(304 / 432);
-  --canvas-width: 92vmin;
-  --canvas-height: calc(92vmin * var(--inverse-aspect-ratio));
+  --canvas-width: 96vmin;
+  --canvas-height: calc(96vmin * var(--inverse-aspect-ratio));
   --font-size: 18px;
   --btn-width: min(
     calc(5 * var(--font-size)),
     calc((var(--canvas-width) - 30px) / 4)
   );
-  --btn-height: calc(2 * var(--font-size));
-  --color-black: #232629;
+  --btn-height: calc(3 * var(--font-size));
 }
 :root {
   --background-color: #ffffff;
