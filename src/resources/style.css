@@ -178,6 +178,23 @@ a:active {
   margin-left: 5px;
   margin-right: 5px;
 }
+#code-viewer {
+  display: inline-block;
+  width: 600%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
+  height: var(--btn-height);
+  overflow-x: auto;
+  border: none;
+  border-radius: 10px;
+  padding: 0;
+  color: var(--btn-color);
+  background-color: var(--btn-background-color);
+  font-size: var(--font-size);
+  text-align: left;
+  text-decoration: none;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
 #game-dropdown-btn {
   margin-left: 0;
 }
@@ -540,4 +557,72 @@ input.toggle-switch + label::before {
 input.toggle-switch:checked + label::before {
   left: var(--toggle-ball-left);
   content: '\263E';
+}
+/* CSS for replay is below */
+#dropbox {
+  border-style: solid;
+  border-color: var(--color);
+  border-width: 2px;
+}
+.btn-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.btn-container.left {
+  grid-column-start: 1;
+  justify-content: flex-start;
+}
+.btn-container.right {
+  grid-column-start: 2;
+  justify-content: flex-end;
+}
+#scrubber-range-input {
+  width: var(--canvas-width);
+  height: var(--btn-height);
+}
+span.margin-left-right {
+  margin-left: calc(var(--font-size) / 1.5);
+  margin-right: calc(var(--font-size) / 1.5);
+}
+button.btn-for-replay {
+  height: var(--btn-height);
+  width: calc(var(--btn-width) / 2);
+  font-size: calc(var(--font-size) / 1.2);
+}
+button.btn-for-replay.selected {
+  background-color: rgb(50, 163, 255);
+  background-image: none;
+  color: white;
+  font-weight: bold;
+}
+#play-pause-btn {
+  font-size: var(--font-size);
+}
+div.inline {
+  display: inline;
+}
+div.margin-top-little {
+  margin-top: calc(var(--font-size) / 1.5);
+}
+input[type='file'] {
+  display: none;
+}
+label.custom-file-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgb(50, 50, 50);
+  margin: 0;
+  padding: 0;
+  background-color: var(--btn-background-color-2);
+  background-image: var(--btn-background-image);
+  color: var(--color);
+  border-radius: 5px;
+  width: var(--btn-width);
+  height: var(--btn-height);
+  cursor: pointer;
+}
+.disable-dbl-tap-zoom {
+  touch-action: manipulation;
 }

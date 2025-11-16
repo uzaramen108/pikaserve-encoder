@@ -8,7 +8,8 @@ module.exports = {
   entry: {
     main: './src/resources/js/main.js',
     ko: './src/ko/ko.js',
-    dark_color_scheme: './src/resources/js/utils/dark_color_scheme.js',
+    dark_color_scheme: './src/resources/js/utils/dark_color_scheme',
+    main_replay: './src/resources/js/replay/main_replay.js',
     is_embedded_in_other_website:
       './src/resources/js/utils/is_embedded_in_other_website.js',
   },
@@ -127,12 +128,31 @@ module.exports = {
         removeComments: true,
       },
     }),
-  new WorkboxPlugin.GenerateSW({
-  swDest: 'sw.js',
-  cleanupOutdatedCaches: true,
-  skipWaiting: false,
-  maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB로 설정
-}),
-
+    new HtmlWebpackPlugin({
+      template: 'src/en/replay/index.html',
+      filename: 'en/replay/index.html',
+      chunks: ['runtime', 'main_replay', 'dark_color_scheme'],
+      chunksSortMode: 'manual',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      template: 'src/ko/replay/index.html',
+      filename: 'ko/replay/index.html',
+      chunks: ['runtime', 'ko', 'main_replay', 'dark_color_scheme'],
+      chunksSortMode: 'manual',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+      },
+    }),  
+      new WorkboxPlugin.GenerateSW({
+      swDest: 'sw.js',
+      cleanupOutdatedCaches: true,
+      skipWaiting: false,
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB로 설정
+    }),
   ],
 };

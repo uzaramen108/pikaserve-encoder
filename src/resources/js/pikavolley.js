@@ -2,10 +2,14 @@
  * The Controller part in MVC pattern
  */
 'use strict';
-import { GROUND_HALF_WIDTH, PikaPhysics } from './physics.js';
+import { GROUND_HALF_WIDTH, PikaPhysics} from './physics.js';
 import { MenuView, GameView, FadeInOut, IntroView } from './view.js';
 import { PikaKeyboard } from './keyboard.js';
 import { PikaAudio } from './audio.js';
+import { PikaUserInput } from './physics.js';
+import { replaySaver } from './replay/replay_saver.js';
+import { true_rand, setCustomRng, rand } from './rand.js';
+import seedrandom from 'seedrandom';
 
 /** @typedef {import('@pixi/display').Container} Container */
 /** @typedef {import('@pixi/loaders').LoaderResource} LoaderResource */
@@ -36,22 +40,20 @@ export class PikachuVolleyball {
     this.view.menu.visible = false;
     this.view.game.visible = false;
     this.view.fadeInOut.visible = false;
+    this.willSaveReplay = true
 
     this.audio = new PikaAudio(resources);
     this.physics = new PikaPhysics(true, true);
-    window.gameInstance = this;
-    console.log(" gameInstance가 생성되었습니다!", window.gameInstance);
-   this.keyboardArray = [
-    new PikaKeyboard('KeyD', 'KeyG', 'KeyR', 'KeyF', 'KeyZ', null, 
-        ['KeyV', 'ArrowDown']  // 1P의 추가 아랫방향키 추가
-    ),
-    new PikaKeyboard(
-        'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', null,
-        ['KeyD', 'KeyG', 'KeyR', 'KeyV', 'KeyZ', 'KeyF']
-    ),
-];
-
-
+    this.keyboardArray = [
+      new PikaKeyboard('KeyD', 'KeyG', 'KeyR', 'KeyV', 'KeyZ', 'KeyF', ), // for player1
+      new PikaKeyboard( // for player2
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+        'Enter'
+      ),
+    ];
 
     /** @type {number} game fps */
     this.normalFPS = 25;
@@ -124,23 +126,34 @@ export class PikachuVolleyball {
     if (this.paused === true) {
       return;
     }
+    // catch keyboard input and freeze it
+    this.keyboardArray[0].getInput();
+    this.keyboardArray[1].getInput();
+    const player1Input = new PikaUserInput();
+    const player2Input = new PikaUserInput();
+    player1Input.xDirection = this.keyboardArray[0].xDirection;
+    player1Input.yDirection = this.keyboardArray[0].yDirection;
+    player1Input.powerHit = this.keyboardArray[0].powerHit;
+    player2Input.xDirection = this.keyboardArray[1].xDirection;
+    player2Input.yDirection = this.keyboardArray[1].yDirection;
+    player2Input.powerHit = this.keyboardArray[1].powerHit;
+    
+    replaySaver.recordInputs(player1Input, player2Input);
     if (this.slowMotionFramesLeft > 0) {
       this.slowMotionNumOfSkippedFrames++;
       if (
         this.slowMotionNumOfSkippedFrames %
-          Math.round(this.normalFPS / this.slowMotionFPS) !==
-        0
+          Math.round(this.normalFPS / this.slowMotionFPS) !== 0
       ) {
         return;
       }
       this.slowMotionFramesLeft--;
       this.slowMotionNumOfSkippedFrames = 0;
     }
-    // catch keyboard input and freeze it
-    this.keyboardArray[0].getInput();
-    this.keyboardArray[1].getInput();
     this.state();
   }
+
+  
 
   /**
    * Intro: a man with a brief case
@@ -248,13 +261,13 @@ export class PikachuVolleyball {
       return;
     }
 
-    if (this.noInputFrameCounter >= this.noInputFrameTotal.menu) {
-      this.physics.player1.isComputer = true;
-      this.physics.player2.isComputer = true;
-      this.frameCounter = 0;
-      this.noInputFrameCounter = 0;
-      this.state = this.afterMenuSelection;
-    }
+    // if (this.noInputFrameCounter >= this.noInputFrameTotal.menu) {
+    //   this.physics.player1.isComputer = true;
+    //   this.physics.player2.isComputer = true;
+    //   this.frameCounter = 0;
+    //   this.noInputFrameCounter = 0;
+    //   this.state = this.afterMenuSelection;
+    // }
   }
 
   /**
@@ -282,14 +295,6 @@ export class PikachuVolleyball {
       this.state = this.startOfNewGame;
     }
   }
-  resetServe() {
-    console.log(" 서브 리셋! 실행됨");  // 콘솔 메시지 추가
-    this.roundEnded = false;  // 라운드 종료 상태 해제
-    this.physics.player1.initializeForNewRound();
-    this.physics.player2.initializeForNewRound();
-    this.physics.ball.initializeForNewRound(this.isPlayer2Serve);
-    this.view.game.drawPlayersAndBall(this.physics);
-  }
 
   /**
    * Start of new game: Initialize ball and players and print game start message
@@ -313,6 +318,11 @@ export class PikachuVolleyball {
       this.physics.player1.initializeForNewRound();
       this.physics.player2.initializeForNewRound();
       this.physics.ball.initializeForNewRound(this.isPlayer2Serve);
+      if (this.physics.player1.isComputer) {
+        this.physics.ball.x = 376;
+      } else {
+        this.physics.ball.x = 56;
+      }
       this.view.game.drawPlayersAndBall(this.physics);
 
       this.view.fadeInOut.setBlackAlphaTo(1); // set black screen
@@ -354,9 +364,54 @@ export class PikachuVolleyball {
       return;
     }
 
+    if (this.physics.player1.isComputer) {
+      this.keyboardArray[1].xDirection =
+        this.keyboardArray[0].xDirection || this.keyboardArray[1].xDirection;
+      this.keyboardArray[1].yDirection =
+        this.keyboardArray[0].yDirection || this.keyboardArray[1].yDirection;
+      this.keyboardArray[1].powerHit =
+        this.keyboardArray[0].powerHit || this.keyboardArray[1].powerHit;
+    }
+    if (this.physics.player2.isComputer) {
+      this.keyboardArray[0].xDirection =
+        this.keyboardArray[0].xDirection || this.keyboardArray[1].xDirection;
+      this.keyboardArray[0].yDirection =
+        this.keyboardArray[0].yDirection || this.keyboardArray[1].yDirection;
+      this.keyboardArray[0].powerHit =
+        this.keyboardArray[0].powerHit || this.keyboardArray[1].powerHit;
+    }
+    const player1Input = new PikaUserInput();
+    const player2Input = new PikaUserInput();
+    player1Input.xDirection = this.keyboardArray[0].xDirection;
+    player1Input.yDirection = this.keyboardArray[0].yDirection;
+    player1Input.powerHit = this.keyboardArray[0].powerHit;
+    player2Input.xDirection = this.keyboardArray[1].xDirection;
+    player2Input.yDirection = this.keyboardArray[1].yDirection;
+    player2Input.powerHit = this.keyboardArray[1].powerHit;
+    if (this.physics.player1.isComputer) {
+      ActList.push(player2Input);
+    } else {
+      ActList.push(player1Input);
+    }
+
     const isBallTouchingGround = this.physics.runEngineForNextFrame(
       this.keyboardArray
     );
+    
+
+    if (isBallTouchingGround) {
+        let CodeOutput = [];
+        if (this.physics.player1.isComputer) {
+          console.log(ActList);
+          CodeOutput = encodeActList(ActList, 2);
+        } else {
+          console.log(ActList);
+          CodeOutput = encodeActList(ActList, 1);
+        }
+        let MsgOutput = concatListAsString(CodeOutput);
+        logToNotepad(MsgOutput.slice(1));
+        ActList.length = 0;
+    }
 
     this.playSoundEffect();
     this.view.game.drawPlayersAndBall(this.physics);
@@ -411,7 +466,7 @@ export class PikachuVolleyball {
     if (this.roundEnded === true && this.gameEnded === false) {
       // if this is the last frame of this round, begin fade out
       if (this.slowMotionFramesLeft === 0) {
-        this.view.fadeInOut.changeBlackAlphaBy(1 / 16); // fade out
+        this.view.fadeInOut.changeBlackAlphaBy(1 /16); // fade out
         this.state = this.afterEndOfRound;
       }
     }
@@ -422,14 +477,15 @@ export class PikachuVolleyball {
    * @type {GameState}
    */
   afterEndOfRound() {
-    this.view.fadeInOut.changeBlackAlphaBy(1 / 16);
+    this.view.fadeInOut.changeBlackAlphaBy(1 /16);
     this.frameCounter++;
+    
     if (this.frameCounter >= this.frameTotal.afterEndOfRound) {
       this.frameCounter = 0;
       this.state = this.beforeStartOfNextRound;
     }
   }
-
+  
   /**
    * Before start of next round, initialize ball and players, and print ready message
    * @type {GameState}
@@ -442,11 +498,16 @@ export class PikachuVolleyball {
       this.physics.player1.initializeForNewRound();
       this.physics.player2.initializeForNewRound();
       this.physics.ball.initializeForNewRound(this.isPlayer2Serve);
+      if (this.physics.player1.isComputer) {
+        this.physics.ball.x = 376;
+      } else {
+        this.physics.ball.x = 56;
+      }
       this.view.game.drawPlayersAndBall(this.physics);
     }
 
     this.view.game.drawCloudsAndWave();
-    this.view.fadeInOut.changeBlackAlphaBy(-(1 / 16));
+    this.view.fadeInOut.changeBlackAlphaBy(-(1 /16));
 
     this.frameCounter++;
     if (this.frameCounter % 5 === 0) {
@@ -458,6 +519,7 @@ export class PikachuVolleyball {
       this.view.game.drawReadyMessage(false);
       this.view.fadeInOut.setBlackAlphaTo(0);
       this.roundEnded = false;
+      ActList.length = 0;
       this.state = this.round;
     }
   }
@@ -517,7 +579,12 @@ export class PikachuVolleyball {
     this.slowMotionNumOfSkippedFrames = 0;
     this.view.menu.visible = false;
     this.view.game.visible = false;
+    ActList.length = 0;
     this.state = this.intro;
+    const roomId = 'uzaramen' + true_rand();
+    replaySaver.recordRoomID(roomId);
+    const customRng = seedrandom.alea(roomId.slice(8));
+    setCustomRng(customRng);
   }
 
   /** @return {boolean} */
@@ -533,28 +600,141 @@ export class PikachuVolleyball {
     this.view.game.scoreBoards[0].visible = !bool;
     this.view.game.scoreBoards[1].visible = !bool;
   }
-
-
 }
-// 클래스를 다 정의한 후에, 이벤트 리스너 추가!
-document.addEventListener("keydown", (event) => {
-    if (event.key === "t" || event.key === "T") {
-        console.log("T 키 감지됨 - 서브 리셋 실행");
 
-        let attempts = 0;  // 최대 3초 동안 확인
-        const checkGameInstance = setInterval(() => {
-            if (window.gameInstance) {
-                console.log(" gameInstance 확인됨 - 서브 리셋 실행");
-                window.gameInstance.resetServe();
-                clearInterval(checkGameInstance);  // 실행 후 반복 중지
-            } else {
-                console.warn(` gameInstance가 아직 정의되지 않음 (${attempts + 1}/3)`);
-                attempts++;
-                if (attempts >= 3) {
-                    console.error("3초 후에도 gameInstance가 정의되지 않았습니다!");
-                    clearInterval(checkGameInstance);  // 3초 후 반복 중지
-                }
-            }
-        }, 1000);
+const ActList = [];
+
+/**
+ * @param {PikaUserInput} userInput 
+ */
+function encodeUserInput(userInput, playerNum) {
+  if (playerNum == 1) {
+    if (userInput.powerHit == 1) {
+      if (userInput.xDirection == -1 && userInput.yDirection == -1) {
+        return "-ULH/";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 0) {
+        return "-LH/";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 1) {
+        return "-DLH/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == -1) {
+        return "-UH/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 0) {
+        return "-H/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 1) {
+        return "-DH/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == -1) {
+        return "-URH/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 0) {
+        return "-RH/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 1) {
+        return "-DRH/";
+      } 
+    } else if (userInput.powerHit == 0) {
+      if (userInput.xDirection == -1 && userInput.yDirection == -1) {
+        return "-UL/";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 0) {
+        return "-L/";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 1) {
+        return "-DL/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == -1) {
+        return "-U/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 0) {
+        return "-/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 1) {
+        return "-D/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == -1) {
+        return "-UR/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 0) {
+        return "-R/";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 1) {
+        return "-DR/";
+      } 
+    } 
+  } else {
+    if (userInput.powerHit == 1) {
+      if (userInput.xDirection == -1 && userInput.yDirection == -1) {
+        return "-/ULH";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 0) {
+        return "-/LH";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 1) {
+        return "-/DLH";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == -1) {
+        return "-/UH";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 0) {
+        return "-/H";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 1) {
+        return "-/DH";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == -1) {
+        return "-/URH";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 0) {
+        return "-/RH";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 1) {
+        return "-/DRH";
+      } 
+    } else if (userInput.powerHit == 0) {
+      if (userInput.xDirection == -1 && userInput.yDirection == -1) {
+        return "-/UL";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 0) {
+        return "-/L";
+      } else if (userInput.xDirection == -1 && userInput.yDirection == 1) {
+        return "-/DL";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == -1) {
+        return "-/U";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 0) {
+        return "-/";
+      } else if (userInput.xDirection == 0 && userInput.yDirection == 1) {
+        return "-/D";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == -1) {
+        return "-/UR";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 0) {
+        return "-/R";
+      } else if (userInput.xDirection == 1 && userInput.yDirection == 1) {
+        return "-/DR";
+      } 
+    } 
+
+  }
+}
+/**
+ * 클래스가 'notepad-log'인 요소에 로그 메시지를 추가합니다.
+ * @param {string} message - 추가할 메시지
+ */
+function logToNotepad(message) {
+  const target = document.getElementById('code-viewer-output');
+  if (!target) return;
+
+  // 기존 내용을 지우고 새 메시지를 텍스트로 삽입
+  target.textContent = message;
+}
+
+function encodeActList(code, playerNum) {
+  let code_length = code.length;
+  let new_code = [];
+  for (let i = 0; i < code_length; i++) {
+    new_code.push(encodeUserInput(code[i], playerNum));
+  }
+  return new_code;
+}
+
+function concatListAsString(arr) {
+    if (!Array.isArray(arr) || arr.length === 0) return '';
+
+    let result = '';
+    let current = arr[0];
+    let count = 1;
+
+    for (let i = 1; i < arr.length; i++) {
+      if (arr[i] === current) {
+        count++;
+      } else {
+        result += current + count;
+        current = arr[i];
+        count = 1;
+      }
     }
-});
+
+    // 마지막 문자 처리
+    result += current + count;
+
+    return result;
+}

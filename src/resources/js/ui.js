@@ -4,6 +4,7 @@
 'use strict';
 
 import { localStorageWrapper } from './utils/local_storage_wrapper.js';
+import { replaySaver } from './replay/replay_saver.js';
 
 /** @typedef {import('./pikavolley.js').PikachuVolleyball} PikachuVolleyball */
 /** @typedef {import('@pixi/ticker').Ticker} Ticker */
@@ -22,6 +23,8 @@ const PauseResumePrecedence = {
   dropdown: 1,
   notPaused: 0,
 };
+
+
 
 /**
  * Manages pausing and resuming of the game
@@ -166,6 +169,11 @@ export function setUpUI(pikaVolley, ticker) {
     saveOptions(options);
   };
 
+  const saveReplayBtn = document.getElementById('save-replay-btn');
+  saveReplayBtn.addEventListener('click', () => {
+    replaySaver.saveAsFile();
+  });
+
   // Load and apply saved options
   applyOptions(loadOptions());
 
@@ -198,16 +206,31 @@ export function setUpUI(pikaVolley, ticker) {
     }
   });
 }
+function copyToClipboard(text) {
+	navigator.clipboard.writeText(text).then(() => {
+    	alert("복사되었습니다. 원하는 곳에 붙여넣기하여 주세요.");
+    }).catch(() => {
+    	prompt("키보드의 ctrl+C 또는 마우스 오른쪽의 복사하기를 이용해주세요.",text);
+    });
+};
 
 /**
  * Attach event listeners to the buttons
  * @param {PikachuVolleyball} pikaVolley
  * @param {(options: Options) => void} applyAndSaveOptions
  */
+
 function setUpBtns(pikaVolley, applyAndSaveOptions) {
   const gameDropdownBtn = document.getElementById('game-dropdown-btn');
   const optionsDropdownBtn = document.getElementById('options-dropdown-btn');
   const aboutBtn = document.getElementById('about-btn');
+  const codeCopyBtn = document.getElementById('code-copy-btn');
+
+  codeCopyBtn.addEventListener('click', () => {
+    const codeBlock = document.getElementById('code-viewer-output');
+    const text = codeBlock.textContent//|| codeBlock.innerText; ✅ 텍스트 추출
+    copyToClipboard(text);
+  });
   // @ts-ignore
   gameDropdownBtn.disabled = false;
   // @ts-ignore
@@ -232,6 +255,7 @@ function setUpBtns(pikaVolley, applyAndSaveOptions) {
       pauseBtn.classList.remove('selected');
       pauseResumeManager.resume(pikaVolley, PauseResumePrecedence.pauseBtn);
     }
+    replaySaver.cleanRecord();
     pikaVolley.restart();
   });
 

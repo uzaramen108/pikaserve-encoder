@@ -28,6 +28,7 @@
  */
 'use strict';
 import { rand } from './rand.js';
+import { replaySaver } from './replay/replay_saver.js';
 
 /** @constant @type {number} ground width */
 const GROUND_WIDTH = 432;
@@ -49,6 +50,8 @@ const NET_PILLAR_HALF_WIDTH = 25;
 const NET_PILLAR_TOP_TOP_Y_COORD = 176;
 /** @constant @type {number} net pillar top's bottom side y coordinate (this value is on this physics engine only) */
 const NET_PILLAR_TOP_BOTTOM_Y_COORD = 192;
+const ActList = [];
+
 
 /**
  * It's for to limit the looping number of the infinite loops.
@@ -181,6 +184,7 @@ class Player {
     this.yVelocity = 0; // 0xB0  // initialized to 0
     /** @type {boolean} */
     this.isCollisionWithBallHappened = false; // 0xBC   // initialized to 0 i.e false
+    
 
     /**
      * Player's state
@@ -269,6 +273,7 @@ class Ball {
   /**
    * Initialize for new round
    * @param {boolean} isPlayer2Serve will player on the right side serve on this new round?
+   * 
    */
   initializeForNewRound(isPlayer2Serve) {
     /** @type {number} x coord */
@@ -328,7 +333,7 @@ function physicsEngine(player1, player2, ball, userInputArray) {
       theOtherPlayer,
       ball
     );
-
+    
     // FUN_00402830 omitted
     // FUN_00406020 omitted
     // These two functions omitted above maybe participate in graphic drawing for a player
@@ -348,7 +353,7 @@ function physicsEngine(player1, player2, ball, userInputArray) {
       player.x,
       player.y
     );
-    if (isHappened === true) {
+    if (isHappened === true && player.isComputer == false) {
       if (player.isCollisionWithBallHappened === false) {
         processCollisionBetweenBallAndPlayer(
           ball,
@@ -388,6 +393,7 @@ function isCollisionBetweenBallAndPlayerHappened(ball, playerX, playerY) {
   }
   return false;
 }
+
 
 /**
  * FUN_00402dc0
@@ -514,7 +520,7 @@ function processPlayerMovementAndSetPlayerPosition(
 
   // process x-direction movement
   let playerVelocityX = 0;
-  if (player.state < 5) {
+  if (player.state < 5 && !player.isComputer) {
     if (player.state < 3) {
       playerVelocityX = userInput.xDirection * 6;
     } else {
@@ -549,21 +555,22 @@ function processPlayerMovementAndSetPlayerPosition(
     userInput.yDirection === -1 && // up-direction input
     player.y === PLAYER_TOUCHING_GROUND_Y_COORD // player is touching on the ground
   ) {
-    player.yVelocity = -16;
-    player.state = 1;
-    player.frameNumber = 0;
-    // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
-    // refer to a detailed comment above about this function
-    // maybe-sound code function (playerpointer + 0x90 + 0x10)? omitted
-    player.sound.chu = true;
+    if (!player.isComputer) {
+      player.yVelocity = -16;
+      player.state = 1;
+      player.frameNumber = 0;
+      // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
+      // refer to a detailed comment above about this function
+      // maybe-sound code function (playerpointer + 0x90 + 0x10)? omitted
+      player.sound.chu = true;
+      }    
   }
-
   // gravity
   const futurePlayerY = player.y + player.yVelocity;
   player.y = futurePlayerY;
   if (futurePlayerY < PLAYER_TOUCHING_GROUND_Y_COORD) {
     player.yVelocity += 1;
-  } else if (futurePlayerY > PLAYER_TOUCHING_GROUND_Y_COORD) {
+  } else if (futurePlayerY > PLAYER_TOUCHING_GROUND_Y_COORD && !player.isComputer) {
     // if player is landing..
     player.yVelocity = 0;
     player.y = PLAYER_TOUCHING_GROUND_Y_COORD;
@@ -590,7 +597,7 @@ function processPlayerMovementAndSetPlayerPosition(
       // refer to a detailed comment above about this function
       // maybe-sound function (playerpointer + 0x90 + 0x14)? omitted
       player.sound.pika = true;
-    } else if (player.state === 0 && userInput.xDirection !== 0) {
+    } else if (player.state === 0 && userInput.xDirection !== 0 && !player.isComputer) {
       // then player do diving!
       player.state = 3;
       player.frameNumber = 0;
@@ -696,6 +703,7 @@ function processCollisionBetweenBallAndPlayer(
   // If ball velocity x is 0, randomly choose one of -1, 0, 1.
   if (ball.xVelocity === 0) {
     ball.xVelocity = (rand() % 3) - 1;
+    console.log(replaySaver.roomID);
   }
 
   const ballAbsYVelocity = Math.abs(ball.yVelocity);
@@ -801,97 +809,7 @@ function calculateExpectedLandingPointXFor(ball) {
  * @param {PikaUserInput} userInput user input of the player whom computer controls
  */
 function letComputerDecideUserInput(player, ball, theOtherPlayer, userInput) {
-  userInput.xDirection = 0;
-  userInput.yDirection = 0;
-  userInput.powerHit = 0;
-
-  let virtualExpectedLandingPointX = ball.expectedLandingPointX;
-  if (
-    Math.abs(ball.x - player.x) > 100 &&
-    Math.abs(ball.xVelocity) < player.computerBoldness + 5
-  ) {
-    const leftBoundary = Number(player.isPlayer2) * GROUND_HALF_WIDTH;
-    if (
-      (ball.expectedLandingPointX <= leftBoundary ||
-        ball.expectedLandingPointX >=
-          Number(player.isPlayer2) * GROUND_WIDTH + GROUND_HALF_WIDTH) &&
-      player.computerWhereToStandBy === 0
-    ) {
-      // If conditions above met, the computer estimates the proper location to stay as the middle point of their side
-      virtualExpectedLandingPointX =
-        leftBoundary + ((GROUND_HALF_WIDTH / 2) | 0);
-    }
-  }
-
-  if (
-    Math.abs(virtualExpectedLandingPointX - player.x) >
-    player.computerBoldness + 8
-  ) {
-    if (player.x < virtualExpectedLandingPointX) {
-      userInput.xDirection = 1;
-    } else {
-      userInput.xDirection = -1;
-    }
-  } else if (rand() % 20 === 0) {
-    player.computerWhereToStandBy = rand() % 2;
-  }
-
-  if (player.state === 0) {
-    if (
-      Math.abs(ball.xVelocity) < player.computerBoldness + 3 &&
-      Math.abs(ball.x - player.x) < PLAYER_HALF_LENGTH &&
-      ball.y > -36 &&
-      ball.y < 10 * player.computerBoldness + 84 &&
-      ball.yVelocity > 0
-    ) {
-      userInput.yDirection = -1;
-    }
-
-    const leftBoundary = Number(player.isPlayer2) * GROUND_HALF_WIDTH;
-    const rightBoundary = (Number(player.isPlayer2) + 1) * GROUND_HALF_WIDTH;
-    if (
-      ball.expectedLandingPointX > leftBoundary &&
-      ball.expectedLandingPointX < rightBoundary &&
-      Math.abs(ball.x - player.x) >
-        player.computerBoldness * 5 + PLAYER_LENGTH &&
-      ball.x > leftBoundary &&
-      ball.x < rightBoundary &&
-      ball.y > 174
-    ) {
-      // If conditions above met, the computer decides to dive!
-      userInput.powerHit = 1;
-      if (player.x < ball.x) {
-        userInput.xDirection = 1;
-      } else {
-        userInput.xDirection = -1;
-      }
-    }
-  } else if (player.state === 1 || player.state === 2) {
-    if (Math.abs(ball.x - player.x) > 8) {
-      if (player.x < ball.x) {
-        userInput.xDirection = 1;
-      } else {
-        userInput.xDirection = -1;
-      }
-    }
-    if (Math.abs(ball.x - player.x) < 48 && Math.abs(ball.y - player.y) < 48) {
-      const willInputPowerHit = decideWhetherInputPowerHit(
-        player,
-        ball,
-        theOtherPlayer,
-        userInput
-      );
-      if (willInputPowerHit === true) {
-        userInput.powerHit = 1;
-        if (
-          Math.abs(theOtherPlayer.x - player.x) < 80 &&
-          userInput.yDirection !== -1
-        ) {
-          userInput.yDirection = -1;
-        }
-      }
-    }
-  }
+  
 }
 
 /**
@@ -906,49 +824,6 @@ function letComputerDecideUserInput(player, ball, theOtherPlayer, userInput) {
  * @return {boolean} Will input power hit?
  */
 function decideWhetherInputPowerHit(player, ball, theOtherPlayer, userInput) {
-  if (rand() % 2 === 0) {
-    for (let xDirection = 1; xDirection > -1; xDirection--) {
-      for (let yDirection = -1; yDirection < 2; yDirection++) {
-        const expectedLandingPointX = expectedLandingPointXWhenPowerHit(
-          xDirection,
-          yDirection,
-          ball
-        );
-        if (
-          (expectedLandingPointX <=
-            Number(player.isPlayer2) * GROUND_HALF_WIDTH ||
-            expectedLandingPointX >=
-              Number(player.isPlayer2) * GROUND_WIDTH + GROUND_HALF_WIDTH) &&
-          Math.abs(expectedLandingPointX - theOtherPlayer.x) > PLAYER_LENGTH
-        ) {
-          userInput.xDirection = xDirection;
-          userInput.yDirection = yDirection;
-          return true;
-        }
-      }
-    }
-  } else {
-    for (let xDirection = 1; xDirection > -1; xDirection--) {
-      for (let yDirection = 1; yDirection > -2; yDirection--) {
-        const expectedLandingPointX = expectedLandingPointXWhenPowerHit(
-          xDirection,
-          yDirection,
-          ball
-        );
-        if (
-          (expectedLandingPointX <=
-            Number(player.isPlayer2) * GROUND_HALF_WIDTH ||
-            expectedLandingPointX >=
-              Number(player.isPlayer2) * GROUND_WIDTH + GROUND_HALF_WIDTH) &&
-          Math.abs(expectedLandingPointX - theOtherPlayer.x) > PLAYER_LENGTH
-        ) {
-          userInput.xDirection = xDirection;
-          userInput.yDirection = yDirection;
-          return true;
-        }
-      }
-    }
-  }
   return false;
 }
 

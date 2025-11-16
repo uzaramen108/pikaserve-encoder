@@ -40,9 +40,12 @@ import { CanvasRenderer } from '@pixi/canvas-renderer';
 import { CanvasSpriteRenderer } from '@pixi/canvas-sprite';
 import { CanvasPrepare } from '@pixi/canvas-prepare';
 import '@pixi/canvas-display';
+import seedrandom from 'seedrandom';
 import { PikachuVolleyball } from './pikavolley.js';
 import { ASSETS_PATH } from './assets_path.js';
 import { setUpUI } from './ui.js';
+import { replaySaver } from './replay/replay_saver.js';
+import { true_rand, setCustomRng } from './rand.js';
 
 // Reference for how to use Renderer.registerPlugin:
 // https://github.com/pixijs/pixijs/blob/af3c0c6bb15aeb1049178c972e4a14bb4cabfce4/bundles/pixi.js/src/index.ts#L27-L34
@@ -87,7 +90,6 @@ loader.add(ASSETS_PATH.SPRITE_SHEET);
 for (const prop in ASSETS_PATH.SOUNDS) {
   loader.add(ASSETS_PATH.SOUNDS[prop]);
 }
-
 setUpInitialUI();
 
 /**
@@ -142,6 +144,10 @@ function setUpInitialUI() {
  * Set up the game and the full UI, and start the game.
  */
 function setup() {
+  const roomId = 'uzaramen' + true_rand();
+  replaySaver.recordRoomID(roomId);
+  const customRng = seedrandom.alea(roomId.slice(8));
+  setCustomRng(customRng);
   const pikaVolley = new PikachuVolleyball(stage, loader.resources);
   setUpUI(pikaVolley, ticker);
   start(pikaVolley);

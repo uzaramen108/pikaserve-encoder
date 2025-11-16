@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>피카츄 배구</title>
+    <title>피카츄 배구 서브 인코더</title>
     <meta name="description" content="피카츄 배구 게임" />
     <meta name="author" content="이규태" />
 
@@ -28,7 +28,6 @@
     />
     <link rel="stylesheet" href="../resources/style.css" />
   </head>
-  <body>
     <div id="flex-container">
       <div id="menu-bar">
         <div class="btn-container left">
@@ -164,7 +163,7 @@
                   </button>
                 </div>
               </div>
-              <div class="relative-container">
+              <div class="relative-container" state = "hidden">
                 <button
                   type="button"
                   id="practice-mode-submenu-btn"
@@ -198,14 +197,26 @@
             />
             <label for="dark-color-scheme-checkbox-1"></label>
           </div>
-        </div>
+          </div>
         <div class="btn-container right">
           <button type="button" id="about-btn" class="btn glow">
             <span class="text-about hidden">게임 소개</span
             ><span class="text-play">게임 시작</span>
           </button>
         </div>
+        <div class="relative-container">
+          <button type="button" id="save-replay-btn" class="btn">
+            리플레이 <span class="no-wrap">저장</span>
+          </button>
+        </div>
+        <div class="btn-container" id = "copy-btn">         
+          <button type="button" id="code-copy-btn" class = "btn">복사</button>         
+        </div>
+        <div class="container" id = "code-viewer">
+            <pre><code id="code-viewer-output" class="language-javascript"></code></pre>
+        </div>
       </div>
+      
       <div class="if-embedded-in-other-website hidden">
         <div class="limit-width">
           타 사이트 상에서 피카츄 배구 웹 버전을 실행하고 있는 것 같습니다. 다음
@@ -227,7 +238,7 @@
       <div id="game-canvas-container">
         <div class="fade-in-box about" id="about-box">
           <div id="about-box-head">
-            <h1>피카츄 배구</h1>
+            <h1>피카츄 배구 서브 인코더</h1>
             <p class="languages">
               <a href="../zh/" target="_self">Chinese(中文)</a>
               | <a href="../en/" target="_self">English</a>
@@ -239,15 +250,19 @@
                 >P2P 온라인 버전</a
               >도 있습니다.
             </p>
+            <p class="small">
+              <a href="./replay/" target="_blank" rel="noopener">리플레이 재생기</a
+              >를 사용하여 리플레이 파일을 재생할 수 있습니다.
+            </p>
             <p class="super-ai-edition">
               <a
-                href="https://pika.duckll.tw/ko/"
+                href="https://github.com/ilesejin/PikachuServer"
                 target="_blank"
                 rel="noopener"
-                >슈퍼 AI 버전</a
+                >피카츄 배구 서브 프로그램</a
               >(만든 사람:
-              <a href="https://blog.duckll.tw/" target="_blank" rel="noopener"
-                >DuckLL</a
+              <a href="https://github.com/ilesejin" target="_blank" rel="noopener"
+                >엑사바이트</a
               >)도 있습니다.
             </p>
             <p class="original-by">
