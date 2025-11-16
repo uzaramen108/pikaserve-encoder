@@ -394,6 +394,18 @@ img.controls {
   height: 100%;
   background-color: #eeeeee;
 }
+button {
+  display: inline-block;
+  border: 2px solid var(--btn-border-color);
+  margin: 0;
+  padding: 0;
+  background-color: var(--btn-background-color-2);
+  background-image: var(--btn-background-image);
+  color: var(--color);
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+}
 button.update {
   display: inline-block;
   height: calc(3 * var(--font-size));
