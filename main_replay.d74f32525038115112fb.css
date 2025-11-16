@@ -602,15 +602,6 @@ button.btn-for-replay.selected {
 }
 div.inline {
   display: inline;
-  border: 2px solid var(--btn-border-color);
-  margin: 0;
-  padding: 0;
-  background-color: var(--btn-background-color-2);
-  background-image: var(--btn-background-image);
-  color: var(--color);
-  text-align: center;
-  text-decoration: none;
-  border-radius: 5px;
 }
 div.margin-top-little {
   margin-top: calc(var(--font-size) / 1.5);
@@ -907,4 +898,4 @@ input.toggle-switch:checked + label::before {
   content: '\263E';
 }
 
-/*# sourceMappingURL=main_replay.60361f2d5044171e7448.css.map*/
+/*# sourceMappingURL=main_replay.d74f32525038115112fb.css.map*/
