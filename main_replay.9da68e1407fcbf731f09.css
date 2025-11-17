@@ -235,7 +235,7 @@ span.check {
   display: inline;
 }
 #game-canvas-container {
-  position: absolute;
+  position: relative;
   display: block;
   width: var(--canvas-width);
   height: var(--canvas-height);
@@ -915,4 +915,4 @@ input.toggle-switch:checked + label::before {
   content: '\263E';
 }
 
-/*# sourceMappingURL=main_replay.b6e2b41e35f904a447d0.css.map*/
+/*# sourceMappingURL=main_replay.9da68e1407fcbf731f09.css.map*/
