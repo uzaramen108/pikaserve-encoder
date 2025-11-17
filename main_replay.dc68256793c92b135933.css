@@ -578,6 +578,7 @@ input.toggle-switch:checked + label::before {
 }
 /* CSS for replay is below */
 #dropbox {
+  position: absolute;
   border-style: solid;
   border-color: var(--color);
   border-width: 2px;
@@ -915,4 +916,4 @@ input.toggle-switch:checked + label::before {
   content: '\263E';
 }
 
-/*# sourceMappingURL=main_replay.9da68e1407fcbf731f09.css.map*/
+/*# sourceMappingURL=main_replay.dc68256793c92b135933.css.map*/

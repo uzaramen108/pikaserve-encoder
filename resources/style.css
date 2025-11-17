@@ -578,6 +578,7 @@ input.toggle-switch:checked + label::before {
 }
 /* CSS for replay is below */
 #dropbox {
+  position: absolute;
   border-style: solid;
   border-color: var(--color);
   border-width: 2px;
