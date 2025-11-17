@@ -136,7 +136,6 @@ a:active {
 }
 #update-history-container {
   justify-content: center;
-  align-items: stretch;
   height: auto;
   font-size: var(--font-size);
   padding-left: var(--font-size);
