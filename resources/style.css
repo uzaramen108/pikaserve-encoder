@@ -235,7 +235,7 @@ span.check {
   display: inline;
 }
 #game-canvas-container {
-  position: relative;
+  position: absolute;
   display: block;
   width: var(--canvas-width);
   height: var(--canvas-height);
