@@ -128,7 +128,7 @@ a:active {
   justify-content: center;
   align-items: stretch;
   width: var(--canvas-width);
-  height: 100vh;
+  min-height: 100vh;
   margin-left: auto;
   margin-right: auto;
   padding-top: 8px;
@@ -180,7 +180,7 @@ a:active {
 }
 #code-viewer {
   display: inline-block;
-  width: 600%; /* 너무 넓은 400% 대신 부모 기준으로 꽉 채움 */
+  width: 600%; 
   height: var(--btn-height);
   overflow-x: auto;
   border: none;
@@ -236,6 +236,10 @@ span.check {
 }
 #game-canvas-container {
   position: relative;
+  display: block;
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+  image-rendering: pixelated;
 }
 #game-canvas {
   display: block;
