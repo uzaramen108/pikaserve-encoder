@@ -271,6 +271,8 @@ span.check {
   visibility: visible;
   opacity: 1;
   background-color: var(--background-color-with-alpha);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   animation-name: fade-in;
   animation-duration: 1s;
 }
@@ -913,4 +915,4 @@ input.toggle-switch:checked + label::before {
   content: '\263E';
 }
 
-/*# sourceMappingURL=main_replay.53d60a683f4b5abe2960.css.map*/
+/*# sourceMappingURL=main_replay.9da68e1407fcbf731f09.css.map*/
