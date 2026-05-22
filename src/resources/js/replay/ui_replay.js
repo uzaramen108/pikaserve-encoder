@@ -1,9 +1,10 @@
 import { replayPlayer } from './replay_player.js';
-//import '../../style.css';
+import '../../style.css';
 
 /** @typedef {import('../physics.js').PikaUserInput} PikaUserInput */
 
 let pausedByBtn = false;
+let isUserScrubbing = false;
 
 const scrubberRangeInput = document.getElementById('scrubber-range-input');
 const playPauseBtn = document.getElementById('play-pause-btn');
@@ -58,12 +59,14 @@ export function setUpUI() {
   }
 
   scrubberRangeInput.addEventListener('touchstart', () => {
+    isUserScrubbing = true;
     if (replayPlayer.ticker.started) {
       replayPlayer.ticker.stop();
       replayPlayer.stopBGM();
     }
   });
   scrubberRangeInput.addEventListener('mousedown', () => {
+    isUserScrubbing = true;
     if (replayPlayer.ticker.started) {
       replayPlayer.ticker.stop();
       replayPlayer.stopBGM();
@@ -81,15 +84,30 @@ export function setUpUI() {
       replayPlayer.playBGMProperly();
     }
   });
-  scrubberRangeInput.addEventListener('input', (e) => {
+  //scrubberRangeInput.addEventListener('input', (e) => {
     // @ts-ignore
-    replayPlayer.seekFrame(Number(e.currentTarget.value));
-  });
+  //  replayPlayer.seekFrame(Number(e.currentTarget.value));
+  //});
+
+  scrubberRangeInput.addEventListener('change', (e) => {
+  // @ts-ignore
+  const targetFrame = Number(e.currentTarget.value);
+  replayPlayer.seekFrame(targetFrame);
+  console.log(targetFrame);
+  
+  // 마우스를 놓았으니, isUserScrubbing을 false로 설정합니다.
+  isUserScrubbing = false; 
+
+  // (중요) 마우스를 놓은 위치에서 즉시 재생을 다시 시작합니다.
+  if (!pausedByBtn && !replayPlayer.ticker.started) {
+    replayPlayer.ticker.start();
+    replayPlayer.playBGMProperly();
+  }
+});
 
   // @ts-ignore
   playPauseBtn.disabled = true;
   playPauseBtn.addEventListener('click', () => {
-    console.log("pp buttonpressed");
     if (replayPlayer.ticker.started) {
       replayPlayer.ticker.stop();
       replayPlayer.stopBGM();
@@ -204,6 +222,36 @@ export function setUpUI() {
     }
   });
 
+  const showNicknamesCheckbox = document.getElementById(
+    'show-nicknames-checkbox'
+  );
+  const player1NicknameElem = document.getElementById('player1-nickname');
+  const player2NicknameElem = document.getElementById('player2-nickname');
+  showNicknamesCheckbox.addEventListener('change', () => {
+    // @ts-ignore
+    if (showNicknamesCheckbox.checked) {
+      player1NicknameElem.classList.remove('hidden');
+      player2NicknameElem.classList.remove('hidden');
+    } else {
+      player1NicknameElem.classList.add('hidden');
+      player2NicknameElem.classList.add('hidden');
+    }
+  });
+
+  const showIPsCheckbox = document.getElementById('show-ip-addresses-checkbox');
+  const player1IPElem = document.getElementById('player1-partial-ip');
+  const player2IPElem = document.getElementById('player2-partial-ip');
+  showIPsCheckbox.addEventListener('change', () => {
+    // @ts-ignore
+    if (showIPsCheckbox.checked) {
+      player1IPElem.classList.remove('hidden');
+      player2IPElem.classList.remove('hidden');
+    } else {
+      player1IPElem.classList.add('hidden');
+      player2IPElem.classList.add('hidden');
+    }
+  });
+
   const turnOnBGMCheckbox = document.getElementById('turn-on-bgm-checkbox');
   turnOnBGMCheckbox.addEventListener('change', () => {
     if (replayPlayer.pikaVolley === null) {
@@ -306,6 +354,9 @@ export function setMaxForScrubberRange(max) {
 }
 
 export function moveScrubberTo(value) {
+  /**if (isUserScrubbing) {
+    return;
+  }*/
   // @ts-ignore
   scrubberRangeInput.value = value;
 }

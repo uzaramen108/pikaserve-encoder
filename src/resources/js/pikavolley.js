@@ -116,6 +116,13 @@ export class PikachuVolleyball {
      * @type {GameState}
      */
     this.state = this.intro;
+
+    this.goal_list = {
+      "322,196": true, "322,197": true, "332,186": true, "332,187": true,
+      "342,175": true, "342,176": true, "352,163": true, "352,164": true,
+      "362,150": true, "362,151": true, "372,136": true, "372,137": true,
+      "382,121": true, "392,105": true, "402,88": true, "432,86": true,
+      "431,86": true};
   }
 
   /**
@@ -392,6 +399,12 @@ export class PikachuVolleyball {
       ActList.push(player2Input);
     } else {
       ActList.push(player1Input);
+    }
+    let ballPosKey = `${this.physics.ball.x},${this.physics.ball.y}`;
+    let ball_xvel = this.physics.ball.xVelocity ?? 0;
+    if (ballPosKey in this.goal_list && ball_xvel < 0) {
+      // 브라우저 최상단에 알림창을 띄움
+      alert("달성했습니다!");
     }
 
     const isBallTouchingGround = this.physics.runEngineForNextFrame(

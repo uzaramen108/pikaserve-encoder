@@ -57,6 +57,7 @@
     "@pixi/ticker": "^6.4.2",
     "css-loader": "^7.1.2",
     "file-saver": "^2.0.5",
+    "mini-css-extract-plugin": "^2.9.4",
     "seedrandom": "^3.0.5"
   },
   "main": "webpack.common.js"

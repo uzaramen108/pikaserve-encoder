@@ -23,7 +23,7 @@ import {
   noticeFileOpenError,
   adjustFPSInputValue,
 } from './ui_replay.js';
-//import '../../style.css';
+import '../../style.css';
 import { serialize } from '../utils/serialize.js';
 import { getHashCode } from '../utils/hash_code.js';
 
@@ -163,6 +163,9 @@ export class ReplayPlayer {
   seekFrame(frameNumber) {
     hideNoticeEndOfReplay();
     this.ticker.stop();
+
+    // Cleanup previous pikaVolley
+    this.pikaVolley.initializeForReplay();
 
     if (frameNumber > 0) {
       for (let i = 0; i < frameNumber; i++) {
